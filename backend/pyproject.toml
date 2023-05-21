@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "todo"
+version = "0.1.0"
+description = "To-do list app"
+authors = ["Michal Pytlos <you@example.com>"]
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.2"
+SQLAlchemy = "^1.4.48"
+uvicorn = {extras = ["standard"], version = "^0.22.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
