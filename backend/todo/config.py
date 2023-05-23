@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, BaseSettings
 
 
@@ -11,6 +13,7 @@ class DatabaseConnection(BaseModel):
 
 class Settings(BaseSettings):
     db: DatabaseConnection
+    test_database: Optional[str]
 
     class Config:
         env_nested_delimiter = "__"

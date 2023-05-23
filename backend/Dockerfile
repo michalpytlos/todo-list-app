@@ -25,6 +25,7 @@ COPY todo todo
 RUN poetry install
 
 # Copy required project files
+COPY tests tests
 COPY entrypoint.sh entrypoint.sh
 
 ENTRYPOINT ["bash", "/app/entrypoint.sh"]
