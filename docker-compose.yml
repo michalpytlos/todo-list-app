@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
       target: todo-backend
     container_name: todo_backend
+    env_file:
+      - ./backend/.env
     restart: always
     volumes:
       - ./backend:/app
