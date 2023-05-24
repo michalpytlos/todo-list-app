@@ -10,7 +10,10 @@ services:
       - ./backend/.env
     restart: always
     volumes:
-      - ./backend:/app
+      - ./backend/todo:/app/todo
+      - ./backend/tests:/app/tests
+      - ./backend/pyproject.toml:/app/pyproject.toml
+      - ./backend/poetry.lock:/app/poetry.lock
     ports:
       - 8000:8000
     depends_on:
@@ -23,8 +26,8 @@ services:
         - POSTGRES_PASSWORD=todo
         - POSTGRES_DB=todo
     volumes:
-        - todo-postgres-data:/var/lib/postgresql/data
+        - postgres-data:/var/lib/postgresql/data
     ports:
         - 5432:5432
 volumes:
-  todo-postgres-data:
+  postgres-data:
