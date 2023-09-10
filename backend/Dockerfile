@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS todo-backend
+FROM python:3.11-slim AS todo-backend
 
 ARG PIPX_VERSION=1.2.0
 ARG POETRY_VERSION=1.5.0
