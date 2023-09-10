@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from sqlalchemy.orm import Session
 from todo.todo.models import Todo
 
