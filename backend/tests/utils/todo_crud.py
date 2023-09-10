@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
-from todo.models import Todo
+from todo.todo.models import Todo
 
 
 class TodoTestCrud:

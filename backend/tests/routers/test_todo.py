@@ -4,8 +4,8 @@ from uuid import UUID, uuid4
 import pytest
 from fastapi.testclient import TestClient
 from tests.utils import TodoTestCrud
-from todo import models, schemas
-from todo.routers import todos_router
+from todo.todo import models, schemas
+from todo.todo.api import todos_router
 
 
 @pytest.fixture

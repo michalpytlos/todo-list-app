@@ -2,9 +2,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from todo.crud import TodoCrud
 from todo.database import get_db
-from todo.schemas import Todo, TodoWithId
+from .crud import TodoCrud
+from .schemas import Todo, TodoWithId
 
 todos_router = APIRouter(prefix="/todos", tags=["todo"])
 

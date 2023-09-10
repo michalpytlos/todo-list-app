@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
-from todo import models, schemas
+from . import models, schemas
 
 
 class TodoCrud:
