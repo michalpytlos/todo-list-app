@@ -2,6 +2,13 @@
 
 A simple RESTful API built with FastAPI, SQLAlchemy and PostgreSQL.
 
+## Contents
+* [How to run](#how-to-run)
+* [Tests](#tests)
+* [Development](#development)
+    * [Pre-commit](#pre-commit-hooks)
+    * [Local project environment](#local-project-environment)
+
 ## How to run
 
 1. Navigate to the project root
@@ -21,6 +28,14 @@ A simple RESTful API built with FastAPI, SQLAlchemy and PostgreSQL.
 ### Pre-commit hooks
 
 1. Install [pre-commit](https://pypi.org/project/pre-commit/): `pipx install pre-commit`
-1. Navigate to project root
+1. Navigate to the project root
 1. Set up git hook scripts: `pre-commit install`
-1. (optional) Run against all enlighten files: `pre-commit run --all-files`
+1. (optional) Run against all files: `pre-commit run --all-files`
+
+### Local project environment
+
+1. Install the required Python version: `pyenv install 3.11`
+1. Set the required Python version in the current terminal session: `pyenv shell 3.11`
+1. Navigate to the `backend` directory
+1. Create the env: `pyenv which python | xargs poetry env use`
+1. Install the project dependencies: `poetry install`
