@@ -1,11 +1,12 @@
 from copy import copy
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from tests.utils import TodoTestCrud
-from todo.todo import models, schemas
+from todo.todo import schemas
 from todo.todo.api import todos_router
+
+TODO_URL_PREFIX = todos_router.prefix
 
 
 @pytest.fixture
@@ -14,135 +15,102 @@ def todo_data() -> dict:
     return copy(todo_data)
 
 
-@pytest.fixture
-def url_prefix() -> str:
-    return todos_router.prefix
-
-
-def test_get_todos(
+def test_create_then_get_todos(
     client: TestClient,
-    url_prefix: str,
     todo_data: dict,
-    todo_crud: TodoTestCrud,
 ):
-    # Insert todo
-    todos = [models.Todo(**todo_data), models.Todo(**todo_data)]
-    todo_crud.insert_many(todos)
-    # Send request
-    request_url = url_prefix
-    response = client.get(request_url)
-    # Check if response is correct
+    # Create todos
+    todo_count = 2
+    todos = {}
+    for _ in range(todo_count):
+        response = client.post(url=TODO_URL_PREFIX, json=todo_data)
+        assert response.status_code == 200
+        id = response.json()
+        todos[id] = {"id": id} | todo_data
+    # Get todos
+    response = client.get(url=TODO_URL_PREFIX)
     assert response.status_code == 200
     content = response.json()
-    assert len(content) == len(todos)
+    # All todos were returned
+    assert len(content) == todo_count
+    # Returned todos have all the data
+    for todo in content:
+        assert todo == todos[todo["id"]]
 
 
-def test_create_todo(
+def test_create_then_get_todo(
     client: TestClient,
-    url_prefix: str,
     todo_data: dict,
-    todo_crud: TodoTestCrud,
 ):
-    # Send request
-    request_url = url_prefix
-    response = client.post(request_url, json=todo_data)
-    # Check if response is correct
+    # Create todo
+    response = client.post(url=TODO_URL_PREFIX, json=todo_data)
     assert response.status_code == 200
-    content = response.json()
-    UUID(content)
-    # Check if todo was created
-    todos_in_db = todo_crud.get_all()
-    assert len(todos_in_db) == 1
-    todo_in_db = todos_in_db[0]
-    for k, v in todo_data.items():
-        assert todo_in_db.__dict__[k] == v
-
-
-def test_get_todo(
-    client: TestClient,
-    url_prefix: str,
-    todo_data: dict,
-    todo_crud: TodoTestCrud,
-):
-    # Insert todo
-    todo = models.Todo(**todo_data)
-    todo_id = todo_crud.insert(todo)
-    # Send request
-    request_url = url_prefix + f"/{todo_id}"
-    response = client.get(request_url)
+    id = response.json()
+    # Get todo
+    url = f"{TODO_URL_PREFIX}/{id}"
+    response = client.get(url)
     # Check if response is correct
     assert response.status_code == 200
     content = response.json()
     assert content == todo_data
 
 
-def test_get_todo_not_found(
-    client: TestClient,
-    url_prefix: str,
-):
-    incorrect_todo_id = str(uuid4())
-    request_url = url_prefix + f"/{incorrect_todo_id}"
-    response = client.get(request_url)
-    assert response.status_code == 404
-
-
 def test_update_todo(
     client: TestClient,
-    url_prefix: str,
     todo_data: dict,
-    todo_crud: TodoTestCrud,
 ):
-    # Insert todo
-    todo = models.Todo(**todo_data)
-    todo_id = todo_crud.insert(todo)
-    # Todo is modified in the frontend
+    # Create todo
+    response = client.post(url=TODO_URL_PREFIX, json=todo_data)
+    assert response.status_code == 200
+    id = response.json()
+    # Update todo
     updated_todo_data = copy(todo_data)
     new_description = todo_data["description"] + " new text"
     updated_todo_data["description"] = new_description
-    # Send request
-    request_url = url_prefix + f"/{todo_id}"
-    response = client.put(request_url, json=updated_todo_data)
-    # Check if response is correct
+    url = f"{TODO_URL_PREFIX}/{id}"
+    response = client.put(url, json=updated_todo_data)
     assert response.status_code == 200
     # Check if todo was updated
-    todo_in_db = todo_crud.get_all()[0]
-    assert todo_in_db.description == new_description
-
-
-def test_update_todo_not_found(
-    client: TestClient,
-    url_prefix: str,
-    todo_data: dict,
-):
-    incorrect_todo_id = str(uuid4())
-    request_url = url_prefix + f"/{incorrect_todo_id}"
-    response = client.put(request_url, json=todo_data)
-    assert response.status_code == 404
+    response = client.get(url)
+    assert response.status_code == 200
+    todo = response.json()
+    assert todo["description"] == new_description
 
 
 def test_delete_todo(
     client: TestClient,
-    url_prefix: str,
     todo_data: dict,
-    todo_crud: TodoTestCrud,
 ):
-    # Insert todo
-    todo = models.Todo(**todo_data)
-    todo_id = todo_crud.insert(todo)
-    # Send request
-    request_url = url_prefix + f"/{todo_id}"
-    response = client.delete(request_url)
-    # Check if response is correct
+    # Create todo
+    response = client.post(url=TODO_URL_PREFIX, json=todo_data)
+    assert response.status_code == 200
+    id = response.json()
+    # Delete todo
+    url = f"{TODO_URL_PREFIX}/{id}"
+    response = client.delete(url)
     assert response.status_code == 200
     # Check if todo was deleted
-    assert len(todo_crud.get_all()) == 0
+    response = client.get(url)
+    assert response.status_code == 404
 
 
-def test_delete_todo_not_found(
+def test_update_todo_not_found(
     client: TestClient,
-    url_prefix: str,
+    todo_data: dict,
 ):
-    incorrect_todo_id = str(uuid4())
-    request_url = url_prefix + f"/{incorrect_todo_id}"
-    response = client.delete(request_url)
+    url = f"{TODO_URL_PREFIX}/{str(uuid4())}"
+    response = client.put(url=url, json=todo_data)
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "method",
+    [pytest.param("GET", id="get todo"), pytest.param("DELETE", id="delete todo")],
+)
+def test_todo_not_found(
+    client: TestClient,
+    method: str,
+):
+    url = f"{TODO_URL_PREFIX}/{str(uuid4())}"
+    response = client.request(method=method, url=url)
     assert response.status_code == 404
