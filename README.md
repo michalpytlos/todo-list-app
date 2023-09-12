@@ -19,9 +19,9 @@ A simple RESTful API built with FastAPI, SQLAlchemy and PostgreSQL.
 ## Tests
 
 1. Navigate to the project root
-1. Create and run the app containers: `docker compose up -d`
-1. Run all the tests: `docker exec -t todo_backend pytest tests`
-1. Run all the tests and get a coverage report: `docker exec -t todo_backend pytest --cov=todo --cov-report=term-missing:skip-covered --cov-branch --cov-report=html tests`
+1. Run all the tests: `bash test.sh`
+1. Run all the tests and get a coverage report: `bash test.sh cov`
+1. (optional) Stop and remove containers: `docker compose down`
 
 ## Development
 
