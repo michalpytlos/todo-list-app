@@ -21,7 +21,6 @@ A simple RESTful API built with FastAPI, SQLAlchemy and PostgreSQL.
 1. Navigate to the project root
 1. Run all the tests: `bash test.sh`
 1. Run all the tests and get a coverage report: `bash test.sh cov`
-1. (optional) Stop and remove containers: `docker compose down`
 
 ## Development
 
